@@ -1,0 +1,49 @@
+package service;
+
+import model.FitnessEntry;
+import java.util.*;
+
+public class FitnessTracker {
+    private List<FitnessEntry> entries = new ArrayList<>();
+
+    public void addEntry(FitnessEntry entry) {
+        entries.add(entry);
+        System.out.println("✅ Entry added successfully!\n");
+    }
+
+    public void viewEntries() {
+        if (entries.isEmpty()) {
+            System.out.println("No entries found. Add some data first!\n");
+            return;
+        }
+
+        System.out.println("\n------ FITNESS LOG ------");
+        for (FitnessEntry e : entries) {
+            System.out.println(e);
+        }
+        System.out.println("--------------------------\n");
+    }
+
+    public void showWeeklySummary() {
+        if (entries.isEmpty()) {
+            System.out.println("No data to analyze.\n");
+            return;
+        }
+
+        double avgSteps = entries.stream().mapToInt(FitnessEntry::getSteps).average().orElse(0);
+        double avgCalories = entries.stream().mapToDouble(FitnessEntry::getCalories).average().orElse(0);
+        double avgWater = entries.stream().mapToDouble(FitnessEntry::getWaterIntake).average().orElse(0);
+
+        System.out.println("\n------ WEEKLY SUMMARY ------");
+        System.out.printf("Average Steps: %.2f%n", avgSteps);
+        System.out.printf("Average Calories: %.2f kcal%n", avgCalories);
+        System.out.printf("Average Water Intake: %.2f L%n", avgWater);
+        System.out.println("-----------------------------\n");
+    }
+
+    // ✅ Add this exact method
+    public List<FitnessEntry> getEntries() {
+        return entries;
+    }
+}
+

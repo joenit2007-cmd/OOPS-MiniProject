@@ -1,0 +1,39 @@
+package model;
+
+public class FitnessEntry {
+    private String date;
+    private int steps;
+    private double calories;
+    private double waterIntake; // in liters
+
+    public FitnessEntry(String date, int steps, double calories, double waterIntake) {
+        this.date = date;
+        this.steps = steps;
+        this.calories = calories;
+        this.waterIntake = waterIntake;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public int getSteps() {
+        return steps;
+    }
+
+    public double getCalories() {
+        return calories;
+    }
+
+    public double getWaterIntake() {
+        return waterIntake;
+    }
+
+    @Override
+    public String toString() {
+        return "Date: " + date +
+               " | Steps: " + steps +
+               " | Calories: " + calories +
+               " | Water: " + waterIntake + " L";
+    }
+}

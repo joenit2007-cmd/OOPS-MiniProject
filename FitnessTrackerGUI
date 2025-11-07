@@ -1,0 +1,133 @@
+package main;
+
+import model.FitnessEntry;
+import service.FitnessTracker;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+
+public class FitnessTrackerGUI extends JFrame {
+    private FitnessTracker tracker;
+    private JTextField dateField, stepsField, caloriesField, waterField;
+    private JTextArea outputArea;
+
+    public FitnessTrackerGUI() {
+        tracker = new FitnessTracker();
+        setTitle("🏋️‍♀️ Fitness Progress Tracker");
+        setSize(600, 500);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setLayout(new BorderLayout(10, 10));
+
+        // ===== TOP INPUT PANEL =====
+        JPanel inputPanel = new JPanel(new GridLayout(5, 2, 8, 8));
+        inputPanel.setBorder(BorderFactory.createTitledBorder("Add New Entry"));
+
+        inputPanel.add(new JLabel("Date (YYYY-MM-DD):"));
+        dateField = new JTextField();
+        inputPanel.add(dateField);
+
+        inputPanel.add(new JLabel("Steps:"));
+        stepsField = new JTextField();
+        inputPanel.add(stepsField);
+
+        inputPanel.add(new JLabel("Calories Burned:"));
+        caloriesField = new JTextField();
+        inputPanel.add(caloriesField);
+
+        inputPanel.add(new JLabel("Water Intake (L):"));
+        waterField = new JTextField();
+        inputPanel.add(waterField);
+
+        JButton addButton = new JButton("➕ Add Entry");
+        JButton summaryButton = new JButton("📊 Weekly Summary");
+        inputPanel.add(addButton);
+        inputPanel.add(summaryButton);
+
+        // ===== CENTER OUTPUT AREA =====
+        outputArea = new JTextArea(12, 40);
+        outputArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(outputArea);
+        scrollPane.setBorder(BorderFactory.createTitledBorder("Fitness Log"));
+
+        // ===== BOTTOM BUTTON PANEL =====
+        JButton viewButton = new JButton("📋 View Entries");
+        JButton clearButton = new JButton("🧹 Clear Output");
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.add(viewButton);
+        bottomPanel.add(clearButton);
+
+        // Add panels to window
+        add(inputPanel, BorderLayout.NORTH);
+        add(scrollPane, BorderLayout.CENTER);
+        add(bottomPanel, BorderLayout.SOUTH);
+
+        // ===== BUTTON ACTIONS =====
+        addButton.addActionListener((ActionEvent e) -> addEntry());
+        viewButton.addActionListener((ActionEvent e) -> viewEntries());
+        summaryButton.addActionListener((ActionEvent e) -> showSummary());
+        clearButton.addActionListener((ActionEvent e) -> outputArea.setText(""));
+
+        setVisible(true);
+    }
+
+    private void addEntry() {
+        try {
+            String date = dateField.getText();
+            int steps = Integer.parseInt(stepsField.getText());
+            double calories = Double.parseDouble(caloriesField.getText());
+            double water = Double.parseDouble(waterField.getText());
+
+            tracker.addEntry(new FitnessEntry(date, steps, calories, water));
+            outputArea.append("✅ Entry added successfully for " + date + "\n");
+            clearInputs();
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Please enter valid numeric values for Steps, Calories, and Water.",
+                    "Invalid Input", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void viewEntries() {
+        if (tracker.getEntries().isEmpty()) {
+            outputArea.append("No entries found.\n");
+            return;
+        }
+
+        outputArea.append("\n------ FITNESS LOG ------\n");
+        for (FitnessEntry entry : tracker.getEntries()) {
+            outputArea.append(entry.toString() + "\n");
+        }
+        outputArea.append("--------------------------\n");
+    }
+
+    private void showSummary() {
+        if (tracker.getEntries().isEmpty()) {
+            outputArea.append("No data to analyze.\n");
+            return;
+        }
+
+        double avgSteps = tracker.getEntries().stream().mapToInt(FitnessEntry::getSteps).average().orElse(0);
+        double avgCalories = tracker.getEntries().stream().mapToDouble(FitnessEntry::getCalories).average().orElse(0);
+        double avgWater = tracker.getEntries().stream().mapToDouble(FitnessEntry::getWaterIntake).average().orElse(0);
+
+        outputArea.append("\n------ WEEKLY SUMMARY ------\n");
+        outputArea.append(String.format("Average Steps: %.2f%n", avgSteps));
+        outputArea.append(String.format("Average Calories: %.2f kcal%n", avgCalories));
+        outputArea.append(String.format("Average Water Intake: %.2f L%n", avgWater));
+        outputArea.append("-----------------------------\n");
+    }
+
+    private void clearInputs() {
+        dateField.setText("");
+        stepsField.setText("");
+        caloriesField.setText("");
+        waterField.setText("");
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(FitnessTrackerGUI::new);
+    }
+}
+
